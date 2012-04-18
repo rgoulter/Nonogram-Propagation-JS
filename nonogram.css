@@ -1,0 +1,56 @@
+td.nonogramasd
+{
+    border-color: black;
+    border-style:solid;
+    border-right-width:1px;
+    border-bottom-width:1px;
+}
+td.nonogram
+{
+    border-bottom-width: 1px;
+    border-right-width: 1px;
+    border-bottom-style: solid;
+    border-right-style: solid;
+    border-bottom-color: red;
+    border-right-color: red;
+    padding: 0px;
+    margin: 0px;
+}
+td
+{
+    padding:0px;
+    margin:0px;
+}
+.square
+{
+    font-family: "Arial", monospace;
+    text-align:center;
+    min-width: 15px;
+    min-height: 15px;
+    width: 15px;
+    height: 15px;
+    font-size:11px;
+    padding:0px;
+    margin:0px;
+}
+input.square
+{
+    width: 16px;
+    height: 16px;
+}
+.cell
+{
+    border-top-width: 1px;
+    border-left-width: 1px;
+    border-style: none;
+    border-top-style: solid;
+    border-left-style: solid;
+    border-left-color: grey;
+    border-top-color: grey;
+    padding: 0px;
+    margin: 0px;
+}
+.clueBlank
+{
+    border-style: none;
+}

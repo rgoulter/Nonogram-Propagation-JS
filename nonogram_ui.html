@@ -1,0 +1,183 @@
+<html>
+  <head>
+    <title>Nonogram GUI for CS1010R</title>
+    <link rel="stylesheet" type="text/css" href="nonogram.css" />
+    <style>
+        .unselectable {
+		    -webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			-o-user-select: none;
+			user-select: none;
+		}
+    </style>
+  </head>
+  
+  <body>
+    <div style="text-align: center;">
+        <h2>Nonogram GUI</h2>
+        <em>for CS1010R Nonogram Propogation;
+        <br/>UI by Richard Goulter,
+        <br/>Solver by Ngo Thuy Hang.</em>
+        </div>
+	
+    <!-- <script>console.log = function(){};</script> -->
+    <script src="fd.js" ></script>
+    <script src="FSMAutomaton.js" ></script>
+    <script src="np.js" ></script>
+    <script src="colorsolver.js" /></script>
+	<script src="nonogram_ui.js" ></script>
+    <script src="examples.js" ></script>
+	
+    <table style="width: 100%">
+        <tr>
+            <td style="padding: 30px; text-align: right;">
+                <div id="nono_td_div" style="float: right">
+                <script>
+                    function nonoChanged(puzzle){
+                        var txtBox = document.getElementById("solved_textbox");
+                        if(puzzle.isSolved()){
+                            txtBox.value = "Solved!";
+                            txtBox.style.backgroundColor = "green";
+                        } else {
+                            txtBox.value = "Unsolved!";
+                            txtBox.style.backgroundColor = "red";
+                        }
+                    }
+                    
+                    function do_solve(){
+                        console.log("SOLVING:Beginning solve...");
+                        var solutions = UISolver(nono);
+                        
+                        console.log("Number of solutions found: " + (solutions && solutions.length));
+                        
+                        if(solutions && solutions.length == 1){
+                            nono.setData(solutions[0]);
+                        } else {
+                            
+                            var solnHandler = new MultipleSolutionHandler(nono, solutions);
+                            solnHandler.showUI();
+                            
+                            for(var i = 0; i < solutions.length; i++){
+                                console.log("Soln #" + i + ":");
+                                for(var row = 0; row < nono.getHeight(); row++){
+                                    var rowStr = "";
+                                    for(var col = 0; col < nono.getHeight(); col++){
+                                        rowStr += solutions[i][row][col];
+                                    }
+                                    console.log(rowStr);
+                                }
+                            }
+                        }
+                    }
+                    
+                    ClueRowUI.INITIAL_CLUE_NUM = 10;
+                    var nono = new Nonogram("nonogram", 20, 20, ColorPalette.DEFAULT.clone());
+                    
+                    nono.writePuzzle();
+                    //nono.appendPuzzleToElement(document.getElementById("nono_td_div"));
+                    
+                    nono.onchange = nonoChanged;
+                </script>
+                </div>
+            </td>
+            <td  style="padding: 15px;">
+                <!-- For showing mouse state. -->
+                <b>Mouse State:</b>
+                <input type="text" id="mouse_state_textbox" value="..." size="20" readonly="readonly" />
+                <br/>
+                
+                <b>Colors in Use:</b>
+                <input type="text" id="in_use_textbox" value="..." size="15" readonly="readonly" />
+                <input type="button" value="Check" onclick="checkUsedColors();"/>
+                <script>
+                function checkUsedColors(){
+                    document.getElementById("in_use_textbox").value = JSON.stringify(nono.getColorIndicesInUse());
+                }
+                </script>
+                <br/>
+                <br/>
+                
+                <script>
+                    nono.getPalette().writeBrushSelectorUI();
+                </script>
+                <br/>
+                
+                <!-- Nonogram resizing. -->
+                <input type="text" id="grid_width_textbox" value="5" size="2" readonly="readonly" /> x
+                <input type="text" id="grid_height_textbox" value="5" size="2" readonly="readonly" />
+                <input type="button" id="resize_button" value="Resize" disabled="disabled" onclick="nono.resizeTo(+document.getElementById('grid_width_textbox').value, +document.getElementById('grid_height_textbox').value)"/>
+                <script>
+                function resizingEnabled(b){
+                    document.getElementById("grid_width_textbox").readOnly = !b;
+                    document.getElementById("grid_height_textbox").readOnly = !b;
+                    document.getElementById("resize_button").disabled = !b;
+                }
+                
+                function setSizeTextboxes(){
+	                document.getElementById("grid_width_textbox").value = Nonogram.getDimensions(nono.getData()).width;
+	                document.getElementById("grid_height_textbox").value = Nonogram.getDimensions(nono.getData()).height;
+                }
+                setSizeTextboxes();
+                </script>
+                <br/>
+                
+                <br />
+                <input type="button" value="SOLVE" onclick="var result = do_solve();" style="width: 200px; height: 100px; font-size: 40px;" />
+                <br/><br />
+                
+                <div>
+                Solved?: <input id="solved_textbox" type="text" value="Unsolved" readOnly="readOnly" size="12" />
+                </div>
+                <br/>
+                
+                <input type="button" value="Undo move" onclick="nono.restoreMove();" />
+                <input type="button" value="Edit History" onclick="nono.showAdjustHistoryDialog(this);" />
+            </td>
+        </tr>
+        
+        <tr>
+            <td colspan="2" style="text-align: center">
+                <input type="button" value="to Play Mode" onclick="nono.toPlayState();resizingEnabled(false);" />
+                <input type="button" value="to Edit Mode" onclick="nono.toEditState();resizingEnabled(true);" />
+                <input type="button" value="to Draw Mode" onclick="nono.toDrawState();resizingEnabled(true);" />
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 15px;" colspan="2">
+                <div style="text-align: center;">
+                    <script>
+                      function doSelectedExample(b){
+                          var comboBox = document.getElementById("example_select");
+                          var i = comboBox.options[comboBox.selectedIndex].value;
+                          prepareExample(+i, b);
+                      }
+                    </script>
+                    <b>Some Solutions we prepared earlier...</b><br/>
+                    <select id="example_select">
+                        <option value="0">B&W Example</option>
+                        <option value="1">Color Example</option>
+                        <option value="2">Simple Color Example</option>
+                        <option value="3">Small Example</option>
+                        <option value="4">Cat Example</option>
+                        <option value="5">Chess Example</option>
+                        <option value="6">Forever Example</option>             
+                    </select>
+                    <input type="button" value="Set example clues" onClick="doSelectedExample();" />
+                    <input type="button" value="Set example solution" onClick="doSelectedExample(true);" /><br>
+                
+                    <input type="button" value="Clear cells" onClick="nono.clearCells()" />
+                    <input type="button" value="Clear clues" onClick="nono.clearClues()" /><br>
+                    <!-- 
+                    <input type="button" value="Set size to (5, 5)." onClick="nono.resizeTo(5,5);" />
+                    <input type="button" value="Set size to (20, 20)." onClick="nono.resizeTo(20,20);" />
+                    <input type="button" value="Set size to (20, 30)." onClick="nono.resizeTo(20,30);" /><br>
+                    -->
+                </div>
+            </td>
+        </tr>
+    </table>
+  </body>
+</html>
