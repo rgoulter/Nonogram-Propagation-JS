@@ -38,12 +38,16 @@ function updateMouseState(){
       txt.value = ((mouseDown == 0) ? "Up" : "Down") + " (" + mouseDown + ").";
   }
 };
-//document.body.onmousedown = function(){ ++mouseDown; updateMouseState(); /*return false;*/ }; //return false to avoid dragging
 document.body.addEventListener("mousedown",  function(){ ++mouseDown; updateMouseState(); /*return false;*/ } , true);
-//document.body.onmouseup = function(){ mouseDown = Math.max(0, mouseDown - 1); updateMouseState(); };
 document.body.addEventListener("mouseup",  function(){ mouseDown = Math.max(0, mouseDown - 1); updateMouseState(); /*return false;*/ } , true);
-document.body.onmouseout = function(){ if(document.getElementById("mouse_state_textbox")) document.getElementById("mouse_state_textbox").value = "Mouse out"; };
-//document.body.onmouseout = function(){ mouseDown = 0; }; //To avoid annoying behaviour from annoying users.
+document.body.onmouseout = function(){
+  e = event.toElement || event.relatedTarget;
+  if (!e || !(e.id.search("nonogram") == 0)) {
+      // If we're leaving the nonogram puzzle.
+      mouseDown = 0;
+      return;
+  }
+};
 
 var NonogramConstants = {
 

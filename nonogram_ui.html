@@ -20,7 +20,38 @@
         <em>for CS1010R Nonogram Propogation;
         <br/>UI by Richard Goulter,
         <br/>Solver by Ngo Thuy Hang.</em>
+    </div>
+	
+    <div style="text-align: center;">
+        <h4>Nonograms</h4>
+        <center>
+        <div style="width:600px; text-align: left;">
+        Nonograms are simple puzzle games where the solution is found by filling out
+        a grid using clues, similar to Sudoku. Each row and column contains a sequence of
+        clues which denote how the cells are filled in. Each number represents a consecutive
+        sequence of cells shaded in that color. <br/>
+        See the <a href="http://en.wikipedia.org/wiki/Nonogram">Wikipedia article</a> for
+        a more comprehensive set of rules, and hints on how to play.
+        <br/><br/>
+        Some Examples are prepared below (use the combo box), or you can try making your
+        own Nonograms by using the Draw mode of the solver.
         </div>
+        
+        <h4>The Solver</h4>
+        <div style="width:600px; text-align: left;">
+        The Solver (<a href="https://github.com/rgoulter/Nonogram-Propogation">GitHub repo here</a>)
+        was built upon a Finite-Domain constraint programming library in JavaScript,
+        <a href="http://nishabdam.com:8080/fd/index">fd.js</a>. <br/>
+        Nonograms can be modelled as a set of finite-domain variables subject to the
+        contraints described by the clues. Each sequence of clues along the rows and columns
+        of the Nonogram can be modelled by <a href="http://regular-expressions.info/">Regular Expressions</a>.
+        This solver works by describing the clues to fd.js by building Finite-State Machines from the clues,
+        and constraining the variables for each cell in the grid from there.
+        </div>
+        
+        </center>
+    </div>
+	<br/><br style="clear: both;"/>
 	
     <!-- <script>console.log = function(){};</script> -->
     <script src="fd.js" ></script>
@@ -47,6 +78,13 @@
                     }
                     
                     function do_solve(){
+                        
+                        // If we are in draw mode.
+                        if(document.getElementsByName("nonogram_state")[2].checked){
+                            nono.toPlayState();
+                            nono.clearCells();
+                        }
+                        
                         console.log("SOLVING:Beginning solve...");
                         var solutions = UISolver(nono);
                         
@@ -54,8 +92,12 @@
                         
                         if(solutions && solutions.length == 1){
                             nono.setData(solutions[0]);
+                            if(document.getElementsByName("nonogram_state")[2].checked){
+                                window.alert("Solution is unique. :-)");
+                            }
+                        } else if(!solutions || solutions.length == 0){
+                            window.alert("No solution found");
                         } else {
-                            
                             var solnHandler = new MultipleSolutionHandler(nono, solutions);
                             solnHandler.showUI();
                             
@@ -69,6 +111,11 @@
                                     console.log(rowStr);
                                 }
                             }
+                        }
+                        
+                        // If we are in draw mode.
+                        if(document.getElementsByName("nonogram_state")[2].checked){
+                            nono.toDrawState();
                         }
                     }
                     
@@ -84,6 +131,7 @@
             </td>
             <td  style="padding: 15px;">
                 <!-- For showing mouse state. -->
+                <!--
                 <b>Mouse State:</b>
                 <input type="text" id="mouse_state_textbox" value="..." size="20" readonly="readonly" />
                 <br/>
@@ -98,6 +146,7 @@
                 </script>
                 <br/>
                 <br/>
+                -->
                 
                 <script>
                     nono.getPalette().writeBrushSelectorUI();
@@ -139,9 +188,9 @@
         
         <tr>
             <td colspan="2" style="text-align: center">
-                <input type="button" value="to Play Mode" onclick="nono.toPlayState();resizingEnabled(false);" />
-                <input type="button" value="to Edit Mode" onclick="nono.toEditState();resizingEnabled(true);" />
-                <input type="button" value="to Draw Mode" onclick="nono.toDrawState();resizingEnabled(true);" />
+                <input type="radio" name="nonogram_state" value="play" onclick="nono.toPlayState();resizingEnabled(false);" /> to Play Mode 
+                <input type="radio" name="nonogram_state" value="edit" onclick="nono.toEditState();resizingEnabled(true);" /> to Edit Mode
+                <input type="radio" name="nonogram_state" value="draw" onclick="nono.toDrawState();resizingEnabled(true);" /> to Draw Mode
             </td>
         </tr>
         
